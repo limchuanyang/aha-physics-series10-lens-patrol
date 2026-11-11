@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LENS PATROL: SIGN HUNTER | SPM Physics Sign Convention for Lenses</title>
+<meta name="description" content="Lens Patrol: Sign Hunter - 16-bit retro arcade game for SPM Physics KSSM 4531: Sign Convention for Lenses.">
+<style>
+html,body{margin:0;padding:0;background:#020617;min-height:100%}
+body{padding:8px}
+</style>
+</head>
+<body>
+<!-- LENS PATROL: SIGN HUNTER | AHA Engineering Crab | single-file HTML5 game -->
+<style>
+#lp *{box-sizing:border-box}
+#lp{--b:#38bdf8;--a:#f59e0b;--g:#22c55e;--r:#ef4444;max-width:520px;margin:0 auto;background:#020617;color:#e2e8f0;font-family:"Courier New",monospace;padding:6px;border:3px solid var(--b);box-shadow:0 0 18px #38bdf877;user-select:none;-webkit-user-select:none}
+#lp.hc{--b:#fff;--a:#ff0;--g:#0f0;--r:#f66;background:#000}
+#stage{position:relative;width:min(100%,calc(78vh*.75));min-width:260px;margin:0 auto;aspect-ratio:3/4;background:#020617}
+#cv{width:100%;height:100%;display:block;image-rendering:pixelated;touch-action:none}
+.scr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:rgba(2,6,23,.88);padding:12px;text-align:center;overflow:auto;font-size:clamp(10px,2.6vw,13px);line-height:1.45}
+.scr.on{display:flex}.scr.bot{justify-content:flex-end;background:transparent}
+.scr h2{margin:0;color:var(--a);font-size:clamp(16px,4.6vw,24px);text-shadow:0 0 10px var(--a)}
+.scr p{margin:2px 0}.pos{color:var(--g)}.neg{color:var(--r)}
+.b{font:bold clamp(11px,3vw,14px) "Courier New",monospace;background:#0f172a;color:var(--b);border:2px solid var(--b);padding:8px 12px;cursor:pointer;box-shadow:0 0 10px var(--b);text-transform:uppercase;min-width:190px}
+.b:hover,.b:focus-visible{background:var(--b);color:#020617;outline:2px solid #fff}
+.bar{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center;margin-top:6px}
+.s{font:bold 11px "Courier New",monospace;background:#0f172a;color:var(--b);border:1px solid var(--b);padding:5px 8px;cursor:pointer}
+.s:focus-visible{outline:2px solid #fff}
+#ctl{display:none}#lp.play #ctl{display:flex}
+#ctl button{flex:1;font-size:15px;padding:12px 6px;max-width:150px}
+#bn{color:var(--r);border-color:var(--r)}#bp{color:var(--g);border-color:var(--g)}
+.tb{border-collapse:collapse;font-size:inherit}.tb td{border:1px solid #334155;padding:3px 7px}
+input[type=range]{width:90px;accent-color:#38bdf8}
+.gm{font-size:10px;color:#94a3b8;text-align:center;margin-top:4px}
+</style>
+<div id="lp">
+<div id="stage">
+<canvas id="cv" width="480" height="640" aria-label="Lens Patrol game canvas"></canvas>
+<div class="scr bot on" id="s-boot"><button class="b" data-a="start">&#9658; PRESS START</button><p style="color:#94a3b8">Enter / Space / Tap</p></div>
+<div class="scr bot" id="s-menu">
+<button class="b" data-a="play">Start Mission</button><button class="b" data-a="how">How to Play</button><button class="b" data-a="scores">Top Scores</button><button class="b" data-a="credits">Credits</button><button class="b" data-a="mtog" id="mt1">Music: ON</button></div>
+<div class="scr" id="s-how"><h2>HOW TO PLAY</h2>
+<p>Cards fall from the top. Sort each one into the <b class="neg">NEGATIVE (&minus;)</b> gate on the left or the <b class="pos">POSITIVE (+)</b> gate on the right.</p>
+<p><b>Keys:</b> &larr;/A = NEGATIVE, &rarr;/D = POSITIVE (sorts the lowest card). ESC = pause.<br><b>Touch/Mouse:</b> drag a card into a gate, or use the &minus; / + buttons.</p>
+<p>Wrong sort or missed card = lose a life. Chain answers for COMBOS. Sort fast for the CRITICAL INSIGHT bonus.</p>
+<table class="tb"><tr><td class="pos">POSITIVE (+)</td><td class="neg">NEGATIVE (&minus;)</td></tr><tr><td>u = real object</td><td>u = virtual object</td></tr><tr><td>v = real image</td><td>v = virtual image</td></tr><tr><td>f = convex lens</td><td>f = concave lens</td></tr></table>
+<p>Rounds: Sign Scan &rarr; Physics Challenge &rarr; BOSS.</p><button class="b" data-a="menu">Back</button></div>
+<div class="scr" id="s-scores"><h2>TOP SCORES</h2><div id="sc-l"></div><h2 style="font-size:15px">ACHIEVEMENTS</h2><div id="ac-l"></div><button class="b" data-a="menu">Back</button></div>
+<div class="scr" id="s-credits"><h2>CREDITS</h2><p>LENS PATROL: SIGN HUNTER</p><p>Mascot: AHA Engineering Crab</p><p>Curriculum: SPM Physics KSSM 4531<br>Light &mdash; Sign Convention for Lenses</p><p>Audio: procedural Web Audio chiptune<br>Graphics: 100% code-drawn pixel art</p><p style="color:#f59e0b">"Not by sight, but by INSIGHT."</p><button class="b" data-a="menu">Back</button></div>
+<div class="scr" id="s-pause"><h2>PAUSED</h2><button class="b" data-a="resume">Resume</button><button class="b" data-a="restart">Restart Mission</button><button class="b" data-a="menu">Return to Menu</button><button class="b" data-a="mtog" id="mt2">Music: ON</button></div>
+<div class="scr" id="s-over"><h2 style="color:#ef4444;text-shadow:0 0 10px #ef4444">GAME OVER</h2><div id="ov-st"></div><button class="b" data-a="again">Play Again</button><button class="b" data-a="menu">Return Menu</button></div>
+<div class="scr" id="s-win"><h2 style="color:#22c55e;text-shadow:0 0 10px #22c55e">MISSION CLEARED</h2><p style="color:#f59e0b"><b>Not by sight, but by INSIGHT.</b></p><div id="wn-st"></div>
+<table class="tb"><tr><td>Real Object</td><td class="pos">u positive</td></tr><tr><td>Virtual Object</td><td class="neg">u negative</td></tr><tr><td>Real Image</td><td class="pos">v positive</td></tr><tr><td>Virtual Image</td><td class="neg">v negative</td></tr><tr><td>Convex Lens</td><td class="pos">f positive</td></tr><tr><td>Concave Lens</td><td class="neg">f negative</td></tr></table>
+<p>"The lens obeys physics. Mission accomplished."</p><button class="b" data-a="again">Play Again</button><button class="b" data-a="menu">Return Menu</button></div>
+</div>
+<div class="bar" id="ctl"><button class="s" id="bn" data-a="neg" aria-label="Negative gate">&minus; NEG</button><button class="s" data-a="pause" aria-label="Pause">II PAUSE</button><button class="s" id="bp" data-a="pos" aria-label="Positive gate">+ POS</button></div>
+<div class="bar"><button class="s" id="mon">&#9834; ON</button><button class="s" id="mof">&#9834; OFF</button><button class="s" id="mut">MUTE</button><input type="range" id="vol" min="0" max="100" value="50" aria-label="Volume"><button class="s" id="hcb">CONTRAST</button><button class="s" id="rmb">MOTION: ON</button></div>
+<div class="gm">AHA Engineering &bull; SPM Physics 4531</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id),cv=$('cv'),x=cv.getContext('2d'),W=480,H=640,TOT=26;
+const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let st='boot',paused=false,t=0,rm=matchMedia('(prefers-reduced-motion: reduce)').matches,hc=false,g=null,shk=0,parts=[],drag=null;
+const RK=['Novice Crab','Lens Cadet','Optics Explorer','Lens Technician','Optical Engineer','Photon Commander','SPM Physics Master'],RX=[0,100,250,450,700,1000,1400];
+const BASIC=[['REAL OBJECT',1],['VIRTUAL OBJECT',-1],['REAL IMAGE',1],['VIRTUAL IMAGE',-1],['CONVEX LENS',1],['CONCAVE LENS',-1]];
+const CHAL=[['IMAGE ON A SCREEN',1,'Image on a screen is real: v positive'],['UPRIGHT IMAGE, NO SCREEN',-1,'Cannot be on a screen: virtual, v negative'],['CONVERGING LENS',1,'Converging lens is convex: f positive'],['DIVERGING LENS',-1,'Diverging lens is concave: f negative'],['CONVERGING RAYS HIT LENS',-1,'Rays converging to a point beyond: virtual object, u negative'],['DIVERGING RAYS FROM POINT',1,'Rays spread from a point: real object, u positive'],['MAGNIFYING GLASS',1,'Magnifying glass is convex: f positive'],['SHORT-SIGHT CORRECTION',-1,'Myopia uses concave: f negative'],['CAMERA FILM IMAGE',1,'Formed on film: real image, v positive'],['IMAGE ON OBJECT SIDE',-1,'Same side as object: virtual, v negative']];
+const ACH={first:'FIRST HIT',c5:'COMBO x5',c10:'COMBO x10',ins:'INSIGHT x3',boss:'BOSS SLAYER',flaw:'FLAWLESS'};
+let achv=ld('lpa',{});
+const crab={m:'idle',msg:'Not by sight, but by INSIGHT.',t:0};
+const sh=a=>a.map(v=>[Math.random(),v]).sort((p,q)=>p[0]-q[0]).map(v=>v[1]);
+const mk=(c,p)=>({t:c[0],s:c[1],p,m:c[2]?c[2]+'!':`A ${c[0].toLowerCase()} belongs on the ${c[1]>0?'positive':'negative'} side!`});
+const seq=()=>sh(BASIC).concat(sh(BASIC)).map(c=>mk(c,0)).concat(sh(CHAL).slice(0,8).map(c=>mk(c,1)),sh(BASIC).map(c=>mk(c,2)));
+const g0=()=>({sc:0,xp:0,cb:0,best:0,lv:3,ok:0,bad:0,ms:0,res:0,sp:0,sT:1,time:0,cards:[],q:seq(),ri:0,crit:0,bm:0,ban:null,toast:null,ph:0});
+const col=()=>hc?{b:'#fff',a:'#ff0',g:'#0f0',r:'#f66',bg:'#000',bg2:'#000'}:{b:'#38bdf8',a:'#f59e0b',g:'#22c55e',r:'#ef4444',bg:'#020617',bg2:'#0f172a'};
+/* ---------- AUDIO ---------- */
+let AC,master,mg,sg,vol=.5,muted=false,musicOn=true,mi=0,mnext=0,mt=null;
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return}master=AC.createGain();master.connect(AC.destination);mg=AC.createGain();mg.gain.value=.55;mg.connect(master);sg=AC.createGain();sg.gain.value=1;sg.connect(master);av()}if(AC.state==='suspended')AC.resume()}
+function av(){if(master)master.gain.value=muted?0:vol}
+const N=m=>440*Math.pow(2,(m-69)/12);
+function tone(f,d,type,v,w,dest,f2){if(!AC)return;const o=AC.createOscillator(),e=AC.createGain();o.type=type||'square';o.frequency.setValueAtTime(f,w);if(f2)o.frequency.exponentialRampToValueAtTime(f2,w+d);e.gain.setValueAtTime(v,w);e.gain.exponentialRampToValueAtTime(.0001,w+d);o.connect(e);e.connect(dest||sg);o.start(w);o.stop(w+d+.03)}
+function seqn(a,dt,type,v){if(!AC)return;const n=AC.currentTime;a.forEach((f,i)=>tone(f,dt*1.4,type,v||.15,n+i*dt))}
+function sfx(k){if(!AC||muted)return;const n=AC.currentTime;
+if(k==='menu')seqn([660,880],.07);
+else if(k==='ok')seqn([523,659,784],.06);
+else if(k==='bad'){tone(220,.35,'sawtooth',.2,n,sg,60)}
+else if(k==='combo')seqn([523,659,784,1047,1319],.055);
+else if(k==='win')seqn([523,659,784,1047,784,1047,1319,1568],.12,'square',.16);
+else if(k==='over')seqn([392,330,262,196,130],.24,'triangle',.25)}
+const CH=[[57,60,64],[53,57,60],[48,52,55],[55,59,62]];
+function msched(){if(!AC)return;while(mnext<AC.currentTime+.2){const b=(mi>>4)&3,s=mi&15,c=CH[b];
+if([0,3,6,8,11,14].includes(s))tone(N(c[0]-24),.14,'triangle',.4,mnext,mg);
+tone(N(c[s%3]+12),.09,'square',.05,mnext,mg);
+if([0,6,10,13].includes(s))tone(N(c[(s>>1)%3]+24),.16,'square',.06,mnext,mg);
+if(s%4===0)tone(120,.08,'sine',.3,mnext,mg,40);
+mnext+=.11;mi++}}
+function syncM(){const ok=musicOn&&AC&&!paused&&['boot','menu','how','scores','credits','play'].includes(st);
+if(ok&&!mt){mnext=AC.currentTime+.05;mt=setInterval(msched,40)}else if(!ok&&mt){clearInterval(mt);mt=null}}
+function setM(o){musicOn=o;ac();syncM();lab()}
+function lab(){const s=musicOn?'ON':'OFF';$('mt1').textContent=$('mt2').textContent='Music: '+s;$('mut').textContent=muted?'UNMUTE':'MUTE'}
+/* ---------- STATE ---------- */
+function scr(id){document.querySelectorAll('.scr').forEach(e=>e.classList.remove('on'));if(id){$(id).classList.add('on');const b=$(id).querySelector('button');if(b)b.focus({preventScroll:true})}}
+function setS(s,id){st=s;scr(id);$('lp').classList.toggle('play',s==='play');syncM()}
+function say(m,msg,d){crab.m=m;crab.msg=msg;crab.t=d||2.6}
+function newGame(){ac();g=g0();paused=false;parts=[];drag=null;say('idle','Not by sight, but by INSIGHT.',3);setS('play',null);sfx('menu')}
+function pz(on){if(st!=='play'||paused===on)return;paused=on;scr(on?'s-pause':null);syncM()}
+const rankOf=xp=>{let r=0;RX.forEach((v,i)=>{if(xp>=v)r=i});return r};
+function unlock(k){if(achv[k])return;achv[k]=1;sv('lpa',achv);g.toast={t:ACH[k],l:3};say('unlock','Achievement unlocked: '+ACH[k],3);sfx('combo')}
+function burst(px,py,c,n){if(rm)n=Math.min(n,5);for(let i=0;i<n;i++)parts.push({x:px,y:py,vx:(Math.random()-.5)*320,vy:(Math.random()-.5)*320,l:.5+Math.random()*.6,c,s:3+(Math.random()*4|0)})}
+const lowest=()=>{let b=null;g.cards.forEach(c=>{if(!c.f&&(!b||c.y>b.y))b=c});return b};
+function judge(c,side){if(!c||c.f)return;c.f=side;c.dr=0;g.res++;const C=col();
+if(c.s===side){g.ok++;g.cb++;if(g.cb>g.best)g.best=g.cb;const crit=c.y<230;let xp=10+Math.min(g.cb,10)*2;if(crit){xp+=15;g.crit++}
+g.xp+=xp;g.sc+=100+g.cb*10+(crit?150:0);burst(c.x,c.y,C.g,26);sfx('ok');
+if(g.cb%5===0){sfx('combo');say('combo',`Combo x${g.cb}! Optical mastery detected!`)}else say('ok',crit?'CRITICAL INSIGHT!':'Correct! Signal locked.');
+if(g.ok===1)unlock('first');if(g.cb===5)unlock('c5');if(g.cb===10)unlock('c10');if(g.crit===3)unlock('ins');
+const r=rankOf(g.xp);if(r>g.ri){g.ri=r;say('rank','New Rank Achieved!',3);sfx('combo');shk=.2}}
+else lose(c,false)}
+function lose(c,miss){g.lv--;g.cb=0;if(miss)g.ms++;else g.bad++;if(c.p===2)g.bm++;shk=.45;burst(c.x,c.y,col().r,32);sfx('bad');say('bad',(miss?'Signal lost! ':'')+c.m,3.2);if(g.lv<=0)over()}
+function save(win){const l=ld('lps',[]);l.push({s:g.sc,r:RK[g.ri],w:win?1:0});l.sort((a,b)=>b.s-a.s);sv('lps',l.slice(0,5))}
+const acc=()=>{const n=g.ok+g.bad+g.ms;return n?Math.round(g.ok/n*100):0};
+const stats=(arr)=>arr.map(a=>`<p>${a[0]}: <b style="color:#38bdf8">${a[1]}</b></p>`).join('');
+function over(){st='over';save(0);g.cards.forEach(c=>{if(!c.f)burst(c.x,c.y,'#ef4444',10)});say('over','Signal lost. Recalibrate and retry!',1e9);sfx('over');
+$('ov-st').innerHTML=stats([['Final Score',g.sc],['XP Earned',g.xp],['Best Combo','x'+g.best],['Accuracy',acc()+'%'],['Rank Achieved',RK[g.ri]]]);setS('over','s-over')}
+function win(){st='win';const fast=Math.max(0,Math.round(180-g.time))*2,bonus=100+fast;g.xp+=bonus;g.sc+=bonus*5;g.ri=rankOf(g.xp);
+if(g.bm===0)unlock('boss');if(g.lv===3&&g.bad+g.ms===0)unlock('flaw');save(1);burst(240,200,'#f59e0b',60);say('victory','The lens obeys physics. Mission accomplished.',1e9);sfx('win');
+$('wn-st').innerHTML=stats([['Score',g.sc],['XP Earned',g.xp+' (clear +100, speed +'+fast+')'],['Best Combo','x'+g.best],['Accuracy',acc()+'%'],['Rank',RK[g.ri]]]);setS('win','s-win')}
+/* ---------- UPDATE ---------- */
+function spawn(){const d=g.q[g.sp++];x.font='bold 12px "Courier New"';const w=Math.max(150,x.measureText(d.t).width+34),lo=62+w/2+4,hi=418-w/2-4;
+g.cards.push(Object.assign({},d,{w,h:40,x:lo+Math.random()*(hi-lo),y:72,f:0,dr:0}));g.sT=[2.6,2.2,1.6][d.p];g.ph=d.p;
+if([0,12,20].includes(g.sp-1)){g.ban={t:['SIGN SCAN','PHYSICS CHALLENGE ROUND','BOSS ROUND: ABERRATION PRIME'][d.p],l:2.4};if(d.p)sfx('combo')}}
+function upd(dt){t+=dt;if(shk>0)shk=Math.max(0,shk-dt);
+parts.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.l-=dt});parts=parts.filter(p=>p.l>0);
+if(crab.t>0){crab.t-=dt;if(crab.t<=0&&st==='play'){crab.m='idle';crab.msg='Not by sight, but by INSIGHT.'}}
+if(st!=='play'||paused)return;g.time+=dt;
+if(g.sp<TOT){g.sT-=dt;if(g.sT<=0||!g.cards.some(c=>!c.f))spawn()}
+for(const c of g.cards){if(c.f){c.x+=(c.f>0?1:-1)*800*dt;if(c.x<44||c.x>436){c.gone=1;burst(c.x,c.y,c.s===c.f?col().g:col().r,12)}}
+else if(!c.dr){c.y+=([46,58,76][c.p]+g.sp*.7)*dt;if(c.y>516){c.gone=1;g.res++;lose(c,true);if(st!=='play')return}}}
+g.cards=g.cards.filter(c=>!c.gone);
+if(g.ban&&(g.ban.l-=dt)<=0)g.ban=null;if(g.toast&&(g.toast.l-=dt)<=0)g.toast=null;
+if(g.res>=TOT&&!g.cards.length)win()}
+/* ---------- DRAW ---------- */
+function T(s,px,py,sz,c,al,gl){x.font=`bold ${sz}px "Courier New",monospace`;x.textAlign=al||'center';x.fillStyle=c;if(gl&&!hc){x.shadowColor=c;x.shadowBlur=gl}x.fillText(s,px,py);x.shadowBlur=0}
+const CRAB=["....HHHHHH....","...HHHHHHHH...","..HHHHHHHHHH..","RR.RRRRRRRR.RR","RRRRWKRRWKRRRR","R.RRRRRRRRRR.R","..RRRRRRRRRR..","..R.R.RR.R.R.."];
+const BOSS=["...PPPPPP...","..PPPPPPPP..",".PPWWPPWWPP.","PPPWKPPWKPPP","PPPPPPPPPPPP",".PP.PPPP.PP.","..P.P..P.P.."];
+function spr(m,pal,px,py,s,up){m.forEach((row,r)=>{for(let c=0;c<row.length;c++){const k=row[c];if(k==='.')continue;let oy=0;if(up&&r>=3&&r<=4&&(c<2||c>11))oy=-s*2*Math.abs(Math.sin(t*9));x.fillStyle=pal[k];x.fillRect(px+c*s,py+r*s+oy,s,s)}})}
+function crabD(cx,cy,s,m){const bob=Math.sin(t*4)*2+(m==='ok'||m==='combo'||m==='victory'?-Math.abs(Math.sin(t*9))*s:0),sx=m==='bad'&&!rm?Math.sin(t*60)*3:0,C=col();
+const px=cx-7*s+sx,py=cy-4*s+bob,gray=m==='over',ac2={ok:C.g,combo:C.a,rank:C.a,unlock:C.a,victory:C.g,bad:C.r,over:C.r,idle:C.b}[m]||C.b;
+if(!hc){x.fillStyle=ac2+'22';x.beginPath();x.arc(cx,cy,s*8,0,7);x.fill()}
+spr(CRAB,{H:'#facc15',R:gray?'#64748b':(hc?'#fff':'#f97316'),W:'#fff',K:'#000'},px,py,s,['combo','victory','rank','ok'].includes(m));
+T('AHA',cx+sx,py+2.05*s+s*.55,s*1.5,'#000');
+x.strokeStyle='#000';x.lineWidth=Math.max(2,s*.35);x.beginPath();const bad=m==='bad'||m==='over';
+if(m==='idle')x.moveTo(px+5.5*s,py+6.5*s+0),x.lineTo(px+8.5*s,py+6.5*s);else if(bad)x.arc(cx+sx,py+7.4*s,s*1.2,Math.PI*1.1,Math.PI*1.9);else x.arc(cx+sx,py+6.2*s,s*1.3,.1*Math.PI,.9*Math.PI);x.stroke()}
+function bg(){const C=col();x.fillStyle=C.bg;x.fillRect(0,0,W,H);if(!hc){const gr=x.createLinearGradient(0,0,0,H);gr.addColorStop(0,C.bg);gr.addColorStop(1,C.bg2);x.fillStyle=gr;x.fillRect(0,0,W,H)}
+x.strokeStyle=hc?'#333':'rgba(56,189,248,.08)';x.lineWidth=1;const o=rm?0:(t*20)%40;for(let i=-1;i<17;i++){x.beginPath();x.moveTo(0,i*40+o);x.lineTo(W,i*40+o);x.stroke()}for(let i=0;i<13;i++){x.beginPath();x.moveTo(i*40,0);x.lineTo(i*40,H);x.stroke()}
+x.fillStyle=hc?'#888':'#94a3b8';for(let i=0;i<40;i++){const sx=(i*97)%W,sy=((i*53)+(rm?0:t*(10+i%5*8)))%H;x.fillRect(sx,sy,i%3+1,i%3+1)}}
+function dBoot(){const C=col(),s=Math.min(1,t/1.2);crabD(240,300+(1-s)*400,12,'idle');
+const n='AHA ENGINEERING CRAB';T(n.slice(0,Math.floor(Math.max(0,t-.6)*18)),240,140,20,C.a,'center',12);
+if(t>2.4&&(rm||Math.floor(t*8)%7)){T('LENS PATROL:',240,440,40,C.b,'center',22);T('SIGN HUNTER',240,485,40,C.a,'center',22);T('"Not by sight, but by INSIGHT."',240,520,13,C.g)}}
+function dMenu(){const C=col();T('LENS PATROL',240,90,50,C.b,'center',24);T('SIGN HUNTER',240,138,40,C.a,'center',20);T('"Not by sight, but by INSIGHT."',240,170,13,C.g);
+crabD(240,300,10,'idle');['u +','v +','f +'].forEach((s,i)=>T(s,70+i*0,220+i*60+Math.sin(t*2+i)*6,22,C.g,'center',10));['u \u2212','v \u2212','f \u2212'].forEach((s,i)=>T(s,410,220+i*60+Math.sin(t*2+i)*6,22,C.r,'center',10))}
+function rr(px,py,w,h,r){x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath()}
+const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+function dGame(){const C=col(),dn=drag&&drag.x<130,dp=drag&&drag.x>350;
+x.fillStyle=`rgba(239,68,68,${dn?.35:.12})`;x.fillRect(0,60,56,580);x.fillStyle=`rgba(34,197,94,${dp?.35:.12})`;x.fillRect(424,60,56,580);
+x.strokeStyle=C.r;x.lineWidth=2;x.strokeRect(1,61,54,578);x.strokeStyle=C.g;x.strokeRect(425,61,54,578);
+T('\u2212',28,300,44,C.r,'center',14);T('+',452,300,44,C.g,'center',14);
+x.save();x.translate(28,450);x.rotate(-Math.PI/2);T('NEGATIVE GATE',0,5,13,C.r);x.restore();x.save();x.translate(452,450);x.rotate(-Math.PI/2);T('POSITIVE GATE',0,5,13,C.g);x.restore();
+x.setLineDash([6,6]);x.strokeStyle=C.r;x.beginPath();x.moveTo(60,524);x.lineTo(420,524);x.stroke();x.setLineDash([]);
+if(g.sp>20&&g.res<TOT){const bx=240+(shk>0&&!rm?(Math.random()-.5)*8:0);spr(BOSS,{P:'#a855f7',W:'#fff',K:'#ef4444'},bx-30,64,5);x.fillStyle='#1e293b';x.fillRect(150,104,180,6);x.fillStyle=C.r;x.fillRect(150,104,180*Math.max(0,(TOT-g.res)/6),6);T('ABERRATION PRIME',240,122,10,C.r)}
+const lo=lowest();
+g.cards.forEach(c=>{const col2=c.p===2?C.r:c.p===1?C.a:C.b;x.save();x.translate(c.x,c.y);if(c.dr)x.scale(1.08,1.08);if(c.f)x.globalAlpha=.8;
+if(!hc){x.shadowColor=col2;x.shadowBlur=14}x.fillStyle='#0f172a';rr(-c.w/2,-c.h/2,c.w,c.h,6);x.fill();x.lineWidth=2.5;x.strokeStyle=col2;x.stroke();x.shadowBlur=0;
+T(c.t,0,5,12,hc?'#fff':'#e2e8f0');if(c===lo&&!c.dr){T('\u25C4',-c.w/2-12,5,14,C.r);T('\u25BA',c.w/2+12,5,14,C.g)}x.restore()});
+if(crab.msg){const mc={ok:C.g,combo:C.a,rank:C.a,unlock:C.a,victory:C.g,bad:C.r,over:C.r,idle:C.b}[crab.m]||C.b;x.fillStyle='rgba(2,6,23,.92)';rr(64,530,352,28,6);x.fill();x.strokeStyle=mc;x.lineWidth=2;x.stroke();
+x.font='bold 11px "Courier New"';let m=crab.msg,sz=11;while(x.measureText(m).width>336&&sz>7){sz--;x.font=`bold ${sz}px "Courier New"`}T(m,240,549,sz,mc)}
+crabD(240,600,5,crab.m);
+x.fillStyle='rgba(2,6,23,.85)';x.fillRect(0,0,W,58);
+T('SCORE '+g.sc,8,16,11,C.b,'left');T('XP '+g.xp,160,16,11,C.b,'left');T('COMBO x'+g.cb,250,16,11,C.a,'left');T('\u2665'.repeat(g.lv)+'\u2661'.repeat(3-g.lv),472,16,12,C.r,'right');
+T('RANK '+RK[g.ri],8,31,11,C.g,'left');T('TIME '+fmt(g.time),300,31,11,C.b,'left');T(musicOn&&!muted?'\u266A MUSIC ON':'\u266A MUSIC OFF',472,31,11,C.a,'right');
+T('MISSION: '+['SIGN SCAN','PHYSICS CHALLENGE','BOSS: ABERRATION'][g.ph],8,45,10,C.a,'left');T(g.res+'/'+TOT,472,45,10,C.b,'right');
+x.fillStyle='#1e293b';x.fillRect(6,49,468,6);x.fillStyle=C.g;x.fillRect(6,49,468*g.res/TOT,6);
+if(g.ban)T(g.ban.t,240,230,g.ban.t.length>20?20:28,C.a,'center',16);
+if(g.toast){x.fillStyle='rgba(2,6,23,.9)';rr(70,150,340,34,6);x.fill();x.strokeStyle=C.a;x.stroke();T('\u2605 UNLOCKED: '+g.toast.t,240,172,13,C.a,'center',8)}}
+function dParts(){parts.forEach(p=>{x.globalAlpha=Math.min(1,p.l*2);x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});x.globalAlpha=1}
+/* ---------- LOOP ---------- */
+let last=0;
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;upd(dt);
+x.save();if(shk>0&&!rm)x.translate((Math.random()-.5)*shk*26,(Math.random()-.5)*shk*26);bg();
+if(st==='boot')dBoot();else if(['menu','how','scores','credits'].includes(st))dMenu();else if(g)dGame();dParts();x.restore();requestAnimationFrame(loop)}
+/* ---------- INPUT ---------- */
+function act(a){ac();
+if(a==='start'){sfx('menu');setS('menu','s-menu')}
+else if(a==='play'||a==='restart'||a==='again')newGame();
+else if(a==='how'){sfx('menu');setS('how','s-how')}
+else if(a==='scores'){sfx('menu');const l=ld('lps',[]);$('sc-l').innerHTML=l.length?l.map((e,i)=>`<p>${i+1}. <b style="color:#f59e0b">${e.s}</b> &mdash; ${e.r} ${e.w?'\u2605':''}</p>`).join(''):'<p>No scores yet. Start a mission!</p>';
+$('ac-l').innerHTML=Object.keys(ACH).map(k=>`<p style="color:${achv[k]?'#22c55e':'#64748b'}">${achv[k]?'\u2714':'\u2716'} ${ACH[k]}</p>`).join('');setS('scores','s-scores')}
+else if(a==='credits'){sfx('menu');setS('credits','s-credits')}
+else if(a==='menu'){paused=false;sfx('menu');setS('menu','s-menu')}
+else if(a==='pause')pz(true);else if(a==='resume')pz(false);
+else if(a==='mtog')setM(!musicOn);
+else if(a==='neg'&&st==='play'&&!paused)judge(lowest(),-1);
+else if(a==='pos'&&st==='play'&&!paused)judge(lowest(),1)}
+document.addEventListener('click',e=>{const b=e.target.closest('#lp [data-a]');if(b)act(b.dataset.a)});
+document.addEventListener('keydown',e=>{if(!$('lp'))return;const k=e.key;
+if(k==='Escape'||k==='p'||k==='P'){if(st==='play')pz(!paused);return}
+if(st==='play'&&!paused){if(k==='ArrowLeft'||k==='a'||k==='A'){e.preventDefault();act('neg')}else if(k==='ArrowRight'||k==='d'||k==='D'){e.preventDefault();act('pos')}}
+else if(st==='boot'&&(k==='Enter'||k===' ')){e.preventDefault();act('start')}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&st==='play')pz(true)});
+const pt=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}};
+cv.addEventListener('pointerdown',e=>{if(st!=='play'||paused)return;ac();const p=pt(e);for(let i=g.cards.length-1;i>=0;i--){const c=g.cards[i];if(!c.f&&Math.abs(p.x-c.x)<c.w/2+8&&Math.abs(p.y-c.y)<c.h/2+10){c.dr=1;drag=c;try{cv.setPointerCapture(e.pointerId)}catch(_){}break}}});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pt(e);drag.x=Math.max(20,Math.min(460,p.x));drag.y=Math.max(70,Math.min(510,p.y))});
+const rel=()=>{if(!drag)return;const c=drag;drag=null;c.dr=0;if(c.x<130)judge(c,-1);else if(c.x>350)judge(c,1)};
+cv.addEventListener('pointerup',rel);cv.addEventListener('pointercancel',rel);
+$('mon').onclick=()=>setM(true);$('mof').onclick=()=>setM(false);
+$('mut').onclick=()=>{ac();muted=!muted;av();lab()};
+$('vol').oninput=e=>{ac();vol=e.target.value/100;av()};
+$('hcb').onclick=()=>{hc=!hc;$('lp').classList.toggle('hc',hc)};
+const rml=()=>$('rmb').textContent='MOTION: '+(rm?'REDUCED':'ON');
+$('rmb').onclick=()=>{rm=!rm;rml()};rml();lab();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
